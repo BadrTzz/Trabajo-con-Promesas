@@ -68,10 +68,27 @@ function actualizarGastoUsuario(usuario, gastoId, nuevosDatos) {
 // Debe devolver una promesa. Cuando se resuelva se debe haber eliminado el gasto del usuario
 // y actualizado el fichero de datos
 function borrarGastoUsuario(usuario, gastoId) {
+    return fs.readFile(ficheroDatos)
+        .then(datos => {
+            const obj = JSON.parse(datos);
 
-    // TODO
+            if (!obj[usuario]) {
+                return Promise.reject(new Error("Usuario no existente"));
+            }
 
+            const lista = obj[usuario];
+            const indice = lista.findIndex(g => g.id === gastoId);
+
+            if (indice === -1) {
+                return Promise.reject(new Error("Gasto no existente"));
+            }
+
+            lista.splice(indice, 1);
+
+            return fs.writeFile(ficheroDatos, JSON.stringify(obj));
+        });
 }
+
 
 // Exportación de funciones
 // Normalmente en NodeJS se utiliza el sistema CommonJS,
