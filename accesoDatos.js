@@ -27,14 +27,41 @@ function obtenerGastosUsuario(usuario) {
 // Debe devolver una promesa. Cuando se resuelva se debe haber añadido un nuevo gasto al usuario
 // y actualizado el fichero de datos
 function anyadirGastoUsuario(usuario, gasto) {
-   
+    return fs.readFile(ficheroDatos)
+    .then(datos => {
+        const obj = JSON.parse(datos);
+
+        if(!obj[usuario]) {
+            obj[usuario] = [];
+        }
+
+        obj[usuario].push(gasto);
+        return fs.writeFile(ficheroDatos, JSON.stringify(obj));
+    })
 }
 
 // Debe devolver una promesa. Cuando se resuelva se debe haber modificado el gasto del usuario
 // y actualizado el fichero de datos
 function actualizarGastoUsuario(usuario, gastoId, nuevosDatos) {
+    return fs.readFile(ficheroDatos)
+    .then(datos => {
+        const obj = JSON.parse(datos);
 
-    // TODO
+        if(!obj[usuario]) {
+            return Promise.reject(new Error("usuario no existente"));
+        }
+
+        const lista = obj[usuario];
+        const indice = lista.findIndex(g => g.id === gastoId);
+
+        if(indice === -1) {
+            return Promise.reject(new Error("Gasto  no existente"));
+        }
+
+        lista[indice] = nuevosDatos;
+
+        return fs.writeFile(ficheroDatos, JSON.stringify(obj));
+    })
 
 }
 
